@@ -2,8 +2,19 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Jun 25 18:13:51 2019
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-@author: john
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You need copy of the GNU General Public License
+    along with this program.  See <https://www.gnu.org/licenses/>.
+@author: john-G8CQX
 calculate power spectrum by fft of autocorrelation function
 """
 import pyaudio
