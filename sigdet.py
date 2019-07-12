@@ -39,13 +39,22 @@ while True:
     x = np.frombuffer(data, dtype=np.int16)
     x =x.astype(float)
     x = signal.decimate(x,DECIMATION)
+    narrf = []
+    narrp = []
     f,p = signal.periodogram(x,CHUNKSIZE//(DECIMATION*10))
     p = 10*np.log10(p)
-    max = np.amax(p)
-    av = np.mean(p)
+    for j in range(len(f)):
+        if 4e2 < f[j] <1e3:
+            narrf.append(f[j])
+            narrp.append(p[j])
+    max = np.amax(narrp)
+    av = np.mean(narrp)
+    for j in range(len(narrp)):
+        if max - narrp[j]:
+            maxfreq = narrf[j]
     diff = max-av
-    print("maximum " + str(max) + " and mean" + str(av) + " diff " + str(diff))
-    plt.plot(f,p)
+    print("maximum " + str(max) + "at freq " + str(maxfreq) + " and mean" + str(av) + " diff " + str(diff))
+    plt.plot(narrf,narrp)
     plt.show()
 # close stream
 stream.stop_stream()
