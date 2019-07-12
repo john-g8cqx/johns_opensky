@@ -98,13 +98,13 @@ while True:
         try:
             s = api.get_states(0,None,None,bbox)
             notgotit = False
-        except api.ReadTimeout:
+        except:
             print("api statevector fetch a=gain")
             pass
         if not s:
             print ("no planes")
         else:
-            print(str(len(s) + " planes"))
+            print(str(len(s.states)) + " planes")
             for plane in s.states:
                 newplane = unpack_statevector(plane)
                 newplane['snr'] = diff
