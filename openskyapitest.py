@@ -17,13 +17,23 @@ Created on Mon Jun 24 19:44:04 2019
 
 @author: john-G8CQX
 """
-minlat = 51.25
-maxlat = 51.75
-minlong = 0.5
-maxlong = 1.75
-bbox =[minlat,maxlat,minlong,maxlong]
 from opensky_api import OpenSkyApi
+#minlat = 51.25
+#maxlat = 51.75
+#minlong = 0.5
+#maxlong = 1.75
+#for gb3ngi
+minlat = 52
+maxlat = 54
+minlong = 3
+maxlong = 5
+bbox =[minlat,maxlat,minlong,maxlong]
 api = OpenSkyApi()
 s = api.get_states(0,None,None,bbox)
-for state in s.states:
-    print(state)
+mylist = s.states
+newresults = []
+for l in mylist:
+    newlist = []
+    newlist = [0.0,l]
+    newresults.append(newlist)
+print(newresults)

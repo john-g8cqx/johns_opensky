@@ -93,7 +93,6 @@ while True:
     print("maximum " + str(max) + " and mean" + str(av) + " diff " + str(diff))
     plt.plot(f,p)
     plt.show()
-#    try:
     if True:
         notgotit = True
         while notgotit:
@@ -106,16 +105,14 @@ while True:
         if not s:
             print ("no planes")
         else:
+            print(str(len(s) + " planes"))
             for plane in s.states:
                 newplane = unpack_statevector(plane)
                 newplane['snr'] = diff
                 with open('/home/john/snrplanes.json', 'a') as json_file:  
                    json.dump(newplane, json_file)
-                print ()
-                print(newplane)
-#    except: 
-#        print(" ignoring getting planes exception")
-#        pass
+#                print ()
+#                print(newplane)
                     
 ##close stream
 stream.stop_stream()
