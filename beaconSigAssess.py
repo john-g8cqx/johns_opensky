@@ -93,15 +93,14 @@ while True:
     print("maximum " + str(max) + " and mean" + str(av) + " diff " + str(diff))
     plt.plot(f,p)
     plt.show()
-    if True:
-        notgotit = True
-        while notgotit:
-            try:
-                s = api.get_states(0,None,None,bbox)
-                notgotit = False
-            except api.ReadTimeout:
-                print("api statevector fetch a=gain")
-                pass
+    notgotit = True
+    while notgotit:
+        try:
+            s = api.get_states(0,None,None,bbox)
+            notgotit = False
+        except api.ReadTimeout:
+            print("api statevector fetch a=gain")
+            pass
         if not s:
             print ("no planes")
         else:
