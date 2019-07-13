@@ -7,6 +7,8 @@ Created on Wed Jul 10 08:15:52 2019
 """
 
 #!/usr/bin/env python2
+import time
+import datetime
 from opensky_api import OpenSkyApi
 minlat = 51.25
 maxlat = 51.75
@@ -43,5 +45,6 @@ for plane in mylist:
     planedict['vertical_rate'] = plane.vertical_rate
     planedict['snr'] = 0.0
     biglist.append(planedict)
-for item in biglist:
-    print(item)
+#for item in biglist:
+#    print(item)
+    print("last contact data " + str(planedict["last_contact"]) + " " + str(time.gmtime(planedict["last_contact"])) + " at " + str(datetime.datetime.now()))

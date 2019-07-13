@@ -117,6 +117,8 @@ while True:
             for plane in s.states:
                 newplane = unpack_statevector(plane)
                 newplane['snr'] = diff
+                newlplane['fmax'] = maxfreq
+                newplane['avdb'] = av
                 with open('/home/john/snrplanes.json', 'a') as json_file:  
                    json.dump(newplane, json_file)
 #                print ()
