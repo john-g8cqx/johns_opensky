@@ -55,10 +55,12 @@ gb3vhflat = 51.313
 gb3vhflong = 0.375
 gb3ngilat = 55.063
 gb3ngilong = -6.208
+#select the right beacon
 middle_lat = (mylat + gb3vhflat)/2
 middle_long =(mylong + gb3vhflong)/2
 print("middle latitude " + str(middle_lat))
 print("middle longitude " + str(middle_long))
+#select the right beacon
 vrange = 69*math.cos(middle_long)*(mylong - gb3vhflong)
 hrange = 69*(mylat - gb3vhflat)
 mymidrange = (math.sqrt(math.pow(vrange,2)+ math.pow(hrange,2)))/2 
@@ -96,19 +98,19 @@ while True:
     max = np.amax(narrp)
     av = np.mean(narrp)
     for j in range(len(narrp)):
-        if max - narrp[j]:
+        if max == narrp[j]:
             maxfreq = narrf[j]
     diff = max-av
     print("maximum " + str(max) + "at freq " + str(maxfreq) + " and mean" + str(av) + " diff " + str(diff))
-    plt.plot(narrf,narrp)
-    plt.show()
+#    plt.plot(narrf,narrp)
+#    plt.show()
     notgotit = True
     while notgotit:
         try:
             s = api.get_states(0,None,None,bbox)
             notgotit = False
         except:
-            print("api statevector fetch a=gain")
+            print("api statevector fetch again")
             pass
         if not s:
             print ("no planes")
@@ -119,6 +121,7 @@ while True:
                 newplane['snr'] = diff
                 newlplane['fmax'] = maxfreq
                 newplane['avdb'] = av
+# add valid directory below if this not right
                 with open('/home/john/snrplanes.json', 'a') as json_file:  
                    json.dump(newplane, json_file)
 #                print ()
