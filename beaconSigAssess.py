@@ -106,6 +106,7 @@ while True:
 #    plt.show()
     notgotit = True
     while notgotit:
+        s=0
         try:
             s = api.get_states(0,None,None,bbox)
             notgotit = False
