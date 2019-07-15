@@ -50,7 +50,7 @@ while True:
     max = np.amax(narrp)
     av = np.mean(narrp)
     for j in range(len(narrp)):
-        if max - narrp[j]:
+        if max == narrp[j]:
             maxfreq = narrf[j]
     diff = max-av
     print("maximum " + str(max) + "at freq " + str(maxfreq) + " and mean" + str(av) + " diff " + str(diff))
