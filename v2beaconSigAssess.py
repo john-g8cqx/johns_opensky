@@ -80,6 +80,8 @@ def getsigs(stream,CHUNKSIZE,DECIMATION):
         if max == narrp[j]:
             maxfreq = narrf[j]
     diff = max-av
+#    plt.plot(narrf,narrp)
+#    plt.show()
     return(max,maxfreq,av,diff)
 
 def every(delay, task):
