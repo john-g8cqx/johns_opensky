@@ -26,6 +26,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
 import time
+from timeloop import Timeloop
+from datetime import timedelta
 
 
 def unpack_statevector(plane):
@@ -56,14 +58,12 @@ gb3vhflat = 51.313
 gb3vhflong = 0.375
 gb3ngilat = 55.063
 gb3ngilong = -6.208
-#select the right beacon
-middle_lat = (mylat + gb3vhflat)/2
-middle_long =(mylong + gb3vhflong)/2
+middle_lat = (mylat + gb3ngilat)/2
+middle_long =(mylong + gb3ngilong)/2
 print("middle latitude " + str(middle_lat))
 print("middle longitude " + str(middle_long))
-#select the right beacon
-vrange = 69*math.cos(middle_long)*(mylong - gb3vhflong)
-hrange = 69*(mylat - gb3vhflat)
+vrange = 69*math.cos(middle_long)*(mylong - gb3ngilong)
+hrange = 69*(mylat - gb3ngilat)
 mymidrange = (math.sqrt(math.pow(vrange,2)+ math.pow(hrange,2)))/2 
 midrange_vis_height = 1000*(math.sqrt(math.pow(6371,2) + math.pow(mymidrange,2)) - 6371)
 print("midrange is " + str(mymidrange) + " height limit is above " + str(midrange_vis_height) + " meters")       
@@ -76,14 +76,19 @@ bbox =[minlat,maxlat,minlong,maxlong]
 print(bbox)
 api = OpenSkyApi()
 snrplane = []
-CHUNKSIZE = 480000*6# fixed chunk size 1 minute
-DECIMATION = 1
+CHUNKSIZE = 480000# fixed chunk size 10 sec
+DECIMATION = 10
 fs = CHUNKSIZE
 # initialize portaudio
 p = pyaudio.PyAudio()
 stream = p.open(format=pyaudio.paInt16, channels=1, rate=48000, input=True, frames_per_buffer=CHUNKSIZE)
 diff = 0.0
-while True:
+
+tl = Timeloop()
+
+#while True:
+@tl.job(interval=timedelta(seconds=1))
+def job_every_1s():
     data = stream.read(CHUNKSIZE)
     x = np.frombuffer(data, dtype=np.int16)
     x =x.astype(float)
@@ -102,37 +107,39 @@ while True:
         if max == narrp[j]:
             maxfreq = narrf[j]
     diff = max-av
+    print("1s job current time : {}".format(time.ctime()))
     print("maximum " + str(max) + "at freq " + str(maxfreq) + " and mean" + str(av) + " diff " + str(diff))
 #    plt.plot(narrf,narrp)
 #    plt.show()
-    notgotit = True
-    while notgotit:
-        s=0
-        try:
-            s = api.get_states(0,None,None,bbox)
-            notgotit = False
-        except:
-            print("api statevector fetch again")
-            pass
-        if not s:
-            print ("no planes")
-        else:
-            print(str(len(s.states)) + " planes")
-            for plane in s.states:
-                newplane = unpack_statevector(plane)
-                newplane['snr'] = diff
-                newplane['fmax'] = maxfreq
-                newplane['avdb'] = av
-                snrplane.append(newplane)
-# add valid directory below if this not right
-                with open('/home/john/snrplanes.json', 'a') as json_file:  
-                   json.dump(snrplane, json_file)
+#    notgotit = True
+#    while notgotit:
+#        s=0
+#        try:
+#            s = api.get_states(0,None,None,bbox)
+#            notgotit = False
+#        except:
+#            print("api statevector fetch a=gain")
+#            pass
+#        if not s:
+#            print ("no planes")
+#        else:
+#            print(str(len(s.states)) + " planes")
+#            for plane in s.states:
+#                newplane = unpack_statevector(plane)
+#                newplane['snr'] = diff
+#                newplane['fmax'] = maxfreq
+#                newplane['avdb'] = av
+#                with open('/home/g8cqx/snrplanes.json', 'a') as json_file:  
+#                   json.dump(newplane, json_file)
 #                print ()
 #                print(newplane)
                     
 ##close stream
-stream.stop_stream()
-stream.close()
-p.terminate()
+if __name__ == "__main__":
+    tl.start(block=True)
+    tl.stop   
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
 
 

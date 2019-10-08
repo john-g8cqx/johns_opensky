@@ -17,15 +17,21 @@ Created on Tue Jun 25 18:13:51 2019
 @author: john-G8CQX
 calculate power spectrum by fft of autocorrelation function
 """
+
+
 import pyaudio
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
+from matplotlib import animation, rc
+from IPython.display import HTML
 
 
 
-CHUNKSIZE = 480000# fixed chunk size 10 sec
-DECIMATION = 10
+
+#CHUNKSIZE = 480000# fixed chunk size 10 sec
+CHUNKSIZE = 48000# fixed chunk size 1 sec
+DECIMATION = 1
 fs = CHUNKSIZE
 # initialize portaudio
 p = pyaudio.PyAudio()
@@ -41,10 +47,12 @@ while True:
     x = signal.decimate(x,DECIMATION)
     narrf = []
     narrp = []
-    f,p = signal.periodogram(x,CHUNKSIZE//(DECIMATION*10))
+#    f,p = signal.periodogram(x,CHUNKSIZE//(DECIMATION*10))#10 sec samples
+    f,p = signal.periodogram(x,CHUNKSIZE//(DECIMATION))#1 sec samples
     p = 10*np.log10(p)
     for j in range(len(f)):
-        if 4e2 < f[j] <1e3:
+#        if 1.45e3 < f[j] <1.55e3:
+        if 1.4e3 < f[j] <1.6e3:
             narrf.append(f[j])
             narrp.append(p[j])
     max = np.amax(narrp)
@@ -54,8 +62,13 @@ while True:
             maxfreq = narrf[j]
     diff = max-av
     print("maximum " + str(max) + "at freq " + str(maxfreq) + " and mean" + str(av) + " diff " + str(diff))
+    plt.cla()
+    plt.clf()
+    plt.close()
     plt.plot(narrf,narrp)
     plt.show()
+
+
 # close stream
 stream.stop_stream()
 stream.close()
