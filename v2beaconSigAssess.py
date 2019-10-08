@@ -18,12 +18,13 @@ import matplotlib.pyplot as plt
 from scipy import signal
 import time
 import traceback
-
 import threading
 CHUNKSIZE = 480000# fixed chunk size 10 sec
 DECIMATION = 1
 fs = CHUNKSIZE
 p = pyaudio.PyAudio()
+
+signal_observation_list =[]
 # initialize portaudio
 stream = p.open(format=pyaudio.paInt16, channels=1, rate=48000, input=True, frames_per_buffer=CHUNKSIZE)
  
@@ -59,7 +60,11 @@ def do_stuff():
     h,m,s = tempo.hour, tempo.minute, tempo.second
     max,maxfreq,av,diff = getsigs(stream,CHUNKSIZE,DECIMATION)
     print(f"{h}:{m}:{s}" + " maximum " + str(max) + "at freq " + str(maxfreq) + " and mean " + str(av) + " diff " + str(diff))
-    
+    sigobs = {}
+    sigobs={'hour':h,'minute':m,'second':s,'snr':diff,'frequency':maxfreq}
+#    signal_observation_list.append(sigobs)
+    with open('/home/john/beaconsnrobs.json', 'a+') as json_file:  
+        json.dump(sigobs, json_file)
 
 def getsigs(stream,CHUNKSIZE,DECIMATION):
     data = stream.read(CHUNKSIZE,DECIMATION)
