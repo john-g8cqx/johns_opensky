@@ -62,9 +62,9 @@ def do_stuff():
     print(f"{h}:{m}:{s}" + " maximum " + str(max) + "at freq " + str(maxfreq) + " and mean " + str(av) + " diff " + str(diff))
     sigobs = {}
     sigobs={'hour':h,'minute':m,'second':s,'snr':diff,'frequency':maxfreq}
-#    signal_observation_list.append(sigobs)
+    signal_observation_list.append(sigobs)
     with open('/home/john/beaconsnrobs.json', 'a+') as json_file:  
-        json.dump(sigobs, json_file)
+        json.dump(signal_observation_list, json_file)
 
 def getsigs(stream,CHUNKSIZE,DECIMATION):
     data = stream.read(CHUNKSIZE,DECIMATION)
