@@ -7,10 +7,7 @@ Created on Fri Aug 30 16:26:59 2019
 """
 
 #10  ''' tracking number of times it prints'''
-from threading import Timer, Thread, Event
 from datetime import datetime
-from opensky_api import OpenSkyApi
-import math
 import json
 import pyaudio
 import numpy as np
@@ -19,9 +16,10 @@ from scipy import signal
 import time
 import traceback
 import threading
-CHUNKSIZE = 480000# fixed chunk size 10 sec
+MULTIPLE = 6
+CHUNKSIZE = 480000*MULTIPLE# fixed chunk size 10 sec*MULTIPLE
 DECIMATION = 1
-fs = CHUNKSIZE
+fs = CHUNKSIZE/(10*DECIMATION*MULTIPLE)
 p = pyaudio.PyAudio()
 
 signal_observation_list =[]
@@ -53,15 +51,16 @@ def timcheck():
             
 
 def do_stuff():
-    while timcheck()%10  != 0:
+    while timcheck()  != 0:
         pass
     ts = time.time()
     tempo = datetime.fromtimestamp(ts)
     h,m,s = tempo.hour, tempo.minute, tempo.second
-    max,maxfreq,av,diff = getsigs(stream,CHUNKSIZE,DECIMATION)
+    max,maxfreq,av,diff,freqs = getsigs(stream,CHUNKSIZE,DECIMATION)
     print(f"{h}:{m}:{s}" + " maximum " + str(max) + "at freq " + str(maxfreq) + " and mean " + str(av) + " diff " + str(diff))
+    print('frequencies ' + str(freqs))
     sigobs = {}
-    sigobs={'hour':h,'minute':m,'second':s,'snr':diff,'frequency':maxfreq}
+    sigobs={'hour':h,'minute':m,'second':s,'snr':diff,'frequency':maxfreq,'observed freqs':freqs}
     signal_observation_list.append(sigobs)
     with open('/home/john/beaconsnrobs.json', 'w') as json_file:  
         json.dump(signal_observation_list, json_file)
@@ -73,7 +72,7 @@ def getsigs(stream,CHUNKSIZE,DECIMATION):
     x = signal.decimate(x,DECIMATION)
     narrf = []
     narrp = []
-    f,p = signal.periodogram(x,CHUNKSIZE//(DECIMATION*10))
+    f,p = signal.periodogram(x,fs)
     p = 10*np.log10(p)
     for j in range(len(f)):
         if 4e2 < f[j] <1e3:
@@ -81,13 +80,26 @@ def getsigs(stream,CHUNKSIZE,DECIMATION):
             narrp.append(p[j])
     max = np.amax(narrp)
     av = np.mean(narrp)
+    peaks = np.argpartition(narrp,-8)[-8:]
+    peaks.sort()
+    peaks = peaks[::-1]
+#    print("peaks " + str(peaks) )
+    filtpeaks = [peaks[0]]
+    for index in range(len(peaks)-1):
+        if (peaks[index+1] + 50) < (peaks[index]):
+            filtpeaks.append(peaks[index+1])        
+    freqs = []
+    for peak in filtpeaks:
+        freqs.append(narrf[peak])
+#    print("filtered frequency peaks indexes are " + str(filtpeaks) + " whose frequencies are " + str(freqs))
     for j in range(len(narrp)):
         if max == narrp[j]:
             maxfreq = narrf[j]
+#            print("max freq index really is " + str(j))
     diff = max-av
 #    plt.plot(narrf,narrp)
 #    plt.show()
-    return(max,maxfreq,av,diff)
+    return(max,maxfreq,av,diff,freqs)
 
 def every(delay, task):
   next_time = time.time() + delay
@@ -103,4 +115,4 @@ def every(delay, task):
     next_time += (time.time() - next_time) // delay * delay + delay
 
 
-threading.Thread(target=lambda: every(10, do_stuff)).start()
+threading.Thread(target=lambda: every(60, do_stuff)).start()
