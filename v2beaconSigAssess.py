@@ -7,6 +7,8 @@ Created on Fri Aug 30 16:26:59 2019
 """
 
 #10  ''' tracking number of times it prints'''
+import time
+#from threading import Timer,Thread,Event
 from datetime import datetime
 import json
 import pyaudio
@@ -26,20 +28,20 @@ signal_observation_list =[]
 # initialize portaudio
 stream = p.open(format=pyaudio.paInt16, channels=1, rate=48000, input=True, frames_per_buffer=CHUNKSIZE)
  
-class perpetualTimer():
+#class perpetualTimer():
+#
+#    def __init__(self, duration, hFunction):
+#        self.duration = duration
+#        self.hFunction = hFunction
+#        self.thread = Timer(self.duration, self.handle_function)
 
-    def __init__(self, duration, hFunction):
-        self.duration = duration
-        self.hFunction = hFunction
-        self.thread = Timer(self.duration, self.handle_function)
-
-    def handle_function(self):
-        self.hFunction()
-        self.thread = Timer(self.duration, self.handle_function)
-        self.thread.start()
-
-    def start(self):
-        self.thread.start()
+#    def handle_function(self):
+#        self.hFunction()
+#        self.thread = Timer(self.duration, self.handle_function)
+#        self.thread.start()
+#
+#    def start(self):
+#        self.thread.start()
      
 def timcheck():
     timp = time.time() 
